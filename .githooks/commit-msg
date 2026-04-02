@@ -1,0 +1,20 @@
+#!/bin/sh
+# Remove Cursor-style attribution and collaboration trailers before the commit is finalized.
+# Enable with: ./scripts/enable-git-hooks.sh
+set -e
+msg_file="${1:-}"
+[ -n "$msg_file" ] && [ -f "$msg_file" ] || exit 0
+tmp="$(mktemp)"
+trap 'rm -f "$tmp"' EXIT INT HUP
+sed \
+  -e '/^Co-authored-by:/d' \
+  -e '/^co-authored-by:/d' \
+  -e '/[Mm]ade with [Cc]ursor/d' \
+  -e '/[Gg]enerated with.*[Cc]ursor/d' \
+  -e '/\[[Cc]ursor\]/d' \
+  -e '/cursor\.com/d' \
+  -e '/cursor\.sh/d' \
+  "$msg_file" > "$tmp"
+cat "$tmp" > "$msg_file"
+rm -f "$tmp"
+trap - EXIT INT HUP
