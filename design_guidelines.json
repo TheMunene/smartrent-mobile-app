@@ -1,0 +1,112 @@
+{
+  "identity": "E1: The Anti-AI Designer",
+  "mission": "Create a high-impact, uniquely designed tenant mobile app for Kenya that breaks generic conventions.",
+  "tech_stack": {
+    "framework": "React Native Expo",
+    "language": "JavaScript",
+    "navigation": "expo-router",
+    "styling": "StyleSheet.create()",
+    "icons": "@expo/vector-icons (Ionicons, MaterialIcons)",
+    "animations": "react-native-reanimated"
+  },
+  "typography": {
+    "font_family": {
+      "headings": "PlusJakartaSans_700Bold",
+      "body": "DMSans_400Regular"
+    },
+    "installation_note": "Ensure @expo-google-fonts/plus-jakarta-sans and @expo-google-fonts/dm-sans are installed and loaded in _layout.js.",
+    "sizes": {
+      "h1": 32,
+      "h2": 24,
+      "h3": 20,
+      "body": 16,
+      "caption": 14,
+      "small": 12
+    }
+  },
+  "colors": {
+    "palette": {
+      "primary": "#064E3B",
+      "primary_light": "#059669",
+      "accent": "#34D399",
+      "accent_dim": "rgba(52, 211, 153, 0.1)",
+      "error": "#EF4444",
+      "warning": "#F59E0B",
+      "success": "#10B981"
+    },
+    "themes": {
+      "light": {
+        "background": "#F8FAFC",
+        "surface": "#FFFFFF",
+        "text_primary": "#0F172A",
+        "text_secondary": "#64748B",
+        "border": "#E2E8F0"
+      },
+      "dark": {
+        "background": "#121212",
+        "surface": "#1E1E1E",
+        "text_primary": "#F8FAFC",
+        "text_secondary": "#94A3B8",
+        "border": "#2D2D2D"
+      }
+    }
+  },
+  "spacing": {
+    "xs": 4,
+    "s": 8,
+    "m": 16,
+    "l": 24,
+    "xl": 32,
+    "xxl": 48
+  },
+  "layout_strategies": {
+    "safe_area": "Always wrap screen content in SafeAreaView (from react-native-safe-area-context).",
+    "scroll_view": "Use ScrollView for forms/content, FlatList for long lists (Notices, Tickets).",
+    "keyboard": "Wrap forms in KeyboardAvoidingView (behavior='padding' on iOS, 'height' on Android).",
+    "grid": "For Quick Actions, use flexWrap: 'wrap' with width: '48%' and gap."
+  },
+  "components": {
+    "Button": {
+      "path": "/app/frontend/components/ui/Button.js",
+      "style": "Rounded pill shape or slightly rounded rectangle (radius 12). Primary uses #064E3B with white text. Ghost variant uses transparent bg with accent text.",
+      "interaction": "Use TouchableOpacity with activeOpacity={0.8}. Add slight scale animation on press if possible."
+    },
+    "Card": {
+      "style": "bg-surface rounded-xl p-4 shadow-sm (elevation 2 on Android, shadowOpacity 0.1 on iOS).",
+      "variants": ["RentDue (Gradient)", "Deposit (Mint Green #34D399)", "Standard"]
+    },
+    "Input": {
+      "path": "/app/frontend/components/ui/Input.js",
+      "style": "Bordered rounded-lg (border-gray-200 dark:border-gray-700). Height 50px. Label above, error text below."
+    },
+    "TicketCard": {
+      "style": "Row layout. Left side: Priority indicator strip. content: Title, Category Pill, Date. Right: Chevron."
+    }
+  },
+  "image_urls": {
+    "auth_hero": {
+      "url": "https://images.unsplash.com/photo-1666282167632-c613fbeb163c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MTJ8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwwfHx8fDE3NzM1MTg2NjV8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Modern apartment interior for Auth/Coming Soon screen background"
+    },
+    "home_family": {
+      "url": "https://images.pexels.com/photos/4262423/pexels-photo-4262423.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Happy family for 'Find a Home' or community section"
+    },
+    "maintenance_tools": {
+      "url": "https://images.unsplash.com/photo-1581166418878-11f0dde922c2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwwfHx8fDE3NzM1MTg2NjV8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Tools for Create Ticket header or category visual"
+    }
+  },
+  "universal_guidelines": [
+    "ALL text must be wrapped in <Text> component. No raw strings in Views.",
+    "Do NOT use 'className' or Tailwind classes unless NativeWind is configured (assume it is NOT). Use StyleSheet.create().",
+    "Use 'data-testid' on all TouchableOpacity and TextInput elements for testing.",
+    "Dark Mode: Do not use pure black (#000000). Use #121212 or #1E1E1E to reduce smear on OLED screens.",
+    "Navigation: Use 'expo-router'. Create files in 'app/' directory. Use 'Link' or 'router.push()'.",
+    "Icons: Use '@expo/vector-icons'. Import { Ionicons } from '@expo/vector-icons'.",
+    "Avoid Z-Index wars. Rely on natural stacking order where possible.",
+    "Images: Use 'expo-image' (Image) for better caching and performance.",
+    "Signature: For lease signing, if 'react-native-signature-canvas' is not available, use a placeholder View with dashed border and 'Signature Canvas Placeholder' text."
+  ],
+  "instructions_to_main_agent": "Start by setting up the constants/Colors.js and hooks/useTheme.js (or simple Context). Then build the Tab Layout in app/_layout.js. Implement Auth screen first with the toggle. Build Home Dashboard with the Bento Grid for actions. Ensure M-Pesa flow looks secure and trustworthy."
+}
