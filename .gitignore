@@ -64,6 +64,13 @@ chainlit.md
 .ipynb_checkpoints/
 .ac
 
+# AI context & agent artifacts
+CLAUDE.md
+.cursorrules
+.emergent/
+memory/
+test_result.md
+
 # Deployment
 .vercel
 
