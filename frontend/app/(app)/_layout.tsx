@@ -1,10 +1,21 @@
-import React from 'react';
-import { Tabs } from 'expo-router';
+import React, { useEffect } from 'react';
+import { Tabs, useRouter } from 'expo-router';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '../../constants/Colors';
-import { Platform, StyleSheet, View, Text } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
+import { useAuth } from '../../context/AuthContext';
 
 export default function AppLayout() {
+  const { tenant, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (loading || !tenant) return;
+    if (tenant.profileComplete === false) {
+      router.replace('/(app)/complete-profile');
+    }
+  }, [tenant?.profileComplete, loading]);
+
   return (
     <Tabs
       screenOptions={{
@@ -20,28 +31,42 @@ export default function AppLayout() {
         name="(home)"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, size }) => <Ionicons name="home" size={22} color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="home" size={22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="(tickets)"
         options={{
           title: 'Tickets',
-          tabBarIcon: ({ color, size }) => <MaterialIcons name="confirmation-number" size={22} color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons name="confirmation-number" size={22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="(docs)"
         options={{
           title: 'Docs',
-          tabBarIcon: ({ color, size }) => <Ionicons name="document-text" size={22} color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="document-text" size={22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="(more)"
         options={{
           title: 'More',
-          tabBarIcon: ({ color, size }) => <Ionicons name="grid" size={22} color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="grid" size={22} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="complete-profile"
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+      <Tabs.Screen
+        name="lease-complete"
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
         }}
       />
     </Tabs>
