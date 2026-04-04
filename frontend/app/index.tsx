@@ -4,11 +4,12 @@ import {
   Platform, ScrollView, Animated, ActivityIndicator, Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
 import { useAuth } from '../context/AuthContext';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter, Redirect } from 'expo-router';
+import api from '../utils/api';
 
 const { width } = Dimensions.get('window');
 
@@ -16,12 +17,20 @@ export default function AuthScreen() {
   const [activeTab, setActiveTab] = useState<'login' | 'findHome'>('login');
   const [email, setEmail] = useState('grace.muthoni@gmail.com');
   const [password, setPassword] = useState('password123');
+  const [propertyCode, setPropertyCode] = useState('');
+  const [propertyPreview, setPropertyPreview] = useState<{ propertyName: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login, tenant } = useAuth();
+  const { login, tenant, savedProperty, clearSavedProperty } = useAuth();
   const router = useRouter();
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (savedProperty) {
+      setPropertyCode(savedProperty.propertyCode);
+    }
+  }, [savedProperty]);
 
   // If already logged in, redirect
   if (tenant) {
@@ -37,18 +46,33 @@ export default function AuthScreen() {
     });
   };
 
+  const verifyProperty = async (code: string) => {
+    if (code.length < 3) { setPropertyPreview(null); return; }
+    try {
+      const { data } = await api.get(`/tenant/auth/verify-property?code=${code.toUpperCase()}`);
+      if (data.propertyName) setPropertyPreview({ propertyName: data.propertyName });
+      else setPropertyPreview(null);
+    } catch {
+      setPropertyPreview(null);
+    }
+  };
+
   const handleLogin = async () => {
     if (!email || !password) {
       setError('Please fill in all fields');
       return;
     }
+    if (!savedProperty && !propertyCode) {
+      setError('Please enter your property code');
+      return;
+    }
     setLoading(true);
     setError('');
     try {
-      await login(email, password);
+      await login(email, password, propertyCode || undefined);
       router.replace('/(app)/(home)');
     } catch (e: any) {
-      setError(e.response?.data?.detail || 'Login failed. Please try again.');
+      setError(e.response?.data?.error || e.response?.data?.detail || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -103,6 +127,43 @@ export default function AuthScreen() {
                     <Text style={styles.errorText}>{error}</Text>
                   </View>
                 ) : null}
+
+                {/* Property */}
+                {savedProperty ? (
+                  <View style={styles.propertyBadge}>
+                    <Ionicons name="checkmark-circle" size={20} color={Colors.accent} />
+                    <View style={styles.propertyBadgeInfo}>
+                      <Text style={styles.propertyBadgeName}>{savedProperty.propertyName}</Text>
+                      <Text style={styles.propertyBadgeCode}>{savedProperty.propertyCode}</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => { clearSavedProperty(); setPropertyCode(''); setPropertyPreview(null); }}>
+                      <Text style={styles.wrongPropertyText}>Wrong property?</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.inputLabel}>Property Code</Text>
+                    <View style={styles.inputWrapper}>
+                      <Ionicons name="business-outline" size={20} color={Colors.light.textSecondary} style={styles.inputIcon} />
+                      <TextInput
+                        style={styles.input}
+                        placeholder="SR-XXXXX"
+                        placeholderTextColor="#64748B"
+                        value={propertyCode}
+                        onChangeText={(t) => { setPropertyCode(t.toUpperCase()); setPropertyPreview(null); }}
+                        onBlur={() => verifyProperty(propertyCode)}
+                        autoCapitalize="characters"
+                        autoCorrect={false}
+                      />
+                    </View>
+                    {propertyPreview ? (
+                      <View style={styles.propertyPreview}>
+                        <Ionicons name="checkmark-circle" size={14} color={Colors.accent} />
+                        <Text style={styles.propertyPreviewText}>{propertyPreview.propertyName}</Text>
+                      </View>
+                    ) : null}
+                  </View>
+                )}
 
                 <View style={styles.inputGroup}>
                   <Text style={styles.inputLabel}>Email</Text>
@@ -211,6 +272,18 @@ const styles = StyleSheet.create({
   welcomeSub: { fontFamily: 'DMSans_400Regular', fontSize: 14, color: 'rgba(255,255,255,0.6)', marginBottom: 24 },
   errorBox: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(239,68,68,0.15)', padding: 12, borderRadius: 10, marginBottom: 16 },
   errorText: { fontFamily: 'DMSans_400Regular', fontSize: 13, color: Colors.error, flex: 1 },
+  propertyBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    backgroundColor: 'rgba(52,211,153,0.12)', borderRadius: 12,
+    borderWidth: 1, borderColor: 'rgba(52,211,153,0.3)',
+    paddingHorizontal: 14, paddingVertical: 12, marginBottom: 16,
+  },
+  propertyBadgeInfo: { flex: 1 },
+  propertyBadgeName: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 14, color: '#FFFFFF' },
+  propertyBadgeCode: { fontFamily: 'DMSans_400Regular', fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 1 },
+  wrongPropertyText: { fontFamily: 'DMSans_500Medium', fontSize: 12, color: Colors.accent, textDecorationLine: 'underline' },
+  propertyPreview: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6, marginLeft: 4 },
+  propertyPreviewText: { fontFamily: 'DMSans_500Medium', fontSize: 12, color: Colors.accent },
   inputGroup: { marginBottom: 16 },
   inputLabel: { fontFamily: 'DMSans_500Medium', fontSize: 13, color: 'rgba(255,255,255,0.7)', marginBottom: 6, marginLeft: 4 },
   inputWrapper: {
