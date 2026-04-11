@@ -21,6 +21,7 @@ export default function AuthScreen() {
   const [propertyPreview, setPropertyPreview] = useState<{ propertyName: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const { login, tenant, savedProperty, clearSavedProperty } = useAuth();
   const router = useRouter();
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -193,8 +194,11 @@ export default function AuthScreen() {
                       placeholderTextColor="#64748B"
                       value={password}
                       onChangeText={setPassword}
-                      secureTextEntry
+                      secureTextEntry={!showPassword}
                     />
+                    <TouchableOpacity onPress={() => setShowPassword(v => !v)} style={styles.eyeBtn}>
+                      <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color={Colors.light.textSecondary} />
+                    </TouchableOpacity>
                   </View>
                 </View>
 
@@ -291,6 +295,7 @@ const styles = StyleSheet.create({
     borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)',
   },
   inputIcon: { paddingLeft: 14 },
+  eyeBtn: { paddingHorizontal: 14, paddingVertical: 14 },
   input: {
     flex: 1, fontFamily: 'DMSans_400Regular', fontSize: 15, color: '#FFFFFF',
     paddingVertical: 14, paddingHorizontal: 12,
